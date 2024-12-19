@@ -1,0 +1,10 @@
+﻿  main.cpp
+C:\Users\harry\Desktop\COMP3016\Part2\test\MountainOpenGL\main.cpp(60,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\harry\Desktop\COMP3016\Part2\test\MountainOpenGL\main.cpp(61,17): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\harry\Desktop\COMP3016\Part2\test\MountainOpenGL\main.cpp(65,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\harry\Desktop\COMP3016\Part2\test\MountainOpenGL\main.cpp(66,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\harry\Desktop\COMP3016\Part2\test\MountainOpenGL\main.cpp(67,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\harry\Desktop\COMP3016\Part2\test\MountainOpenGL\main.cpp(68,13): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\harry\Desktop\COMP3016\Part2\test\MountainOpenGL\main.cpp(252,28): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\harry\Desktop\COMP3016\Part2\test\MountainOpenGL\main.cpp(267,79): warning C4267: 'argument': conversion from 'size_t' to 'GLsizei', possible loss of data
+  MountainOpenGL.vcxproj -> C:\Users\harry\Desktop\COMP3016\Part2\test\MountainOpenGL\x64\Debug\MountainOpenGL.exe
