@@ -22,6 +22,11 @@ const float scale = 1.0f;  // Controls the spacing between vertices
 const float frequency = 0.1f; // Controls the "roughness" of the terrain
 const float amplitude = 10.0f; // Controls the height of the terrain
 
+// Time tracking for day/night cycle
+float dayTime = 0.0f; // 0.0f to 1.0f, where 0.0f is midnight and 1.0f is the next midnight
+const float dayCycleSpeed = 0.1f; // Adjust to control how fast the day passes (e.g., higher value = faster cycle)
+
+
 // Cube vertices (positions) for testing
 GLfloat vertices[] = {
     -0.5f, -0.5f, -0.5f, // bottom-left-back
@@ -173,6 +178,11 @@ GLuint createShaderProgram(const std::string& vertexPath, const std::string& fra
     return shaderProgram;
 }
 
+// Add light properties
+glm::vec3 lightPos(50.0f, 50.0f, 50.0f);  // Directional light position
+glm::vec3 lightColor(1.0f, 1.0f, 1.0f);   // White light (Sunlight)
+glm::vec3 ambientColor(0.1f, 0.1f, 0.1f);  // Low ambient light to simulate dawn/dusk
+
 int main() {
     // Initialize GLFW
     glfwInit();
@@ -237,6 +247,11 @@ int main() {
     GLuint shaderProgram = createShaderProgram("vertex_shader.glsl", "fragment_shader.glsl");
     glUseProgram(shaderProgram);
 
+    // Set uniform values for the light
+    glUniform3fv(glGetUniformLocation(shaderProgram, "lightPos"), 1, glm::value_ptr(lightPos));
+    glUniform3fv(glGetUniformLocation(shaderProgram, "lightColor"), 1, glm::value_ptr(lightColor));
+    glUniform3fv(glGetUniformLocation(shaderProgram, "ambientColor"), 1, glm::value_ptr(ambientColor));
+
     // Create transformation matrices
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 view = camera.GetViewMatrix();
@@ -254,6 +269,15 @@ int main() {
         lastFrame = currentFrame;
 
         processInput(window);
+
+        // Update dayTime before updating shader uniform
+        dayTime += deltaTime * dayCycleSpeed;
+        if (dayTime > 1.0f) {
+            dayTime = 0.0f; // Reset to 0 when a full cycle is completed
+        }
+
+        // Update the dayTime uniform
+        glUniform1f(glGetUniformLocation(shaderProgram, "dayTime"), dayTime);
 
         // Clear the screen
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
