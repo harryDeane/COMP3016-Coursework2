@@ -1,5 +1,5 @@
 #include "Camera.h"
-#include <C:/Users/harry/Desktop/COMP3016/Part2/test/MountainOpenGL/glm/gtc/matrix_transform.hpp>
+#include <C:/Users/Public/OpenGL/COMP3016-Coursework2/MountainOpenGL/glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
 
 Camera::Camera(glm::vec3 position, glm::vec3 up, float yaw, float pitch)

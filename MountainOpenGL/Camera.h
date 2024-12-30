@@ -1,8 +1,8 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "C:/Users/harry/Desktop/COMP3016/Part2/test/MountainOpenGL/glm/glm.hpp"
-#include <C:/Users/harry/Desktop/COMP3016/Part2/test/MountainOpenGL/glm/gtc/matrix_transform.hpp>
+#include "C:/Users/Public/OpenGL/COMP3016-Coursework2/MountainOpenGL/glm/glm.hpp"
+#include <C:/Users/Public/OpenGL/COMP3016-Coursework2/MountainOpenGL/glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
 
 class Camera {
