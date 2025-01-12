@@ -1,0 +1,13 @@
+C:/Users/harry/Desktop/assimp/assimp/binaries/CMakeFiles/uninstall.dir
+C:/Users/harry/Desktop/assimp/assimp/binaries/CMakeFiles/UpdateAssimpLibsDebugSymbolsAndDLLs.dir
+C:/Users/harry/Desktop/assimp/assimp/binaries/CMakeFiles/INSTALL.dir
+C:/Users/harry/Desktop/assimp/assimp/binaries/CMakeFiles/ALL_BUILD.dir
+C:/Users/harry/Desktop/assimp/assimp/binaries/CMakeFiles/ZERO_CHECK.dir
+C:/Users/harry/Desktop/assimp/assimp/binaries/contrib/zlib/CMakeFiles/zlibstatic.dir
+C:/Users/harry/Desktop/assimp/assimp/binaries/contrib/zlib/CMakeFiles/INSTALL.dir
+C:/Users/harry/Desktop/assimp/assimp/binaries/contrib/zlib/CMakeFiles/ALL_BUILD.dir
+C:/Users/harry/Desktop/assimp/assimp/binaries/code/CMakeFiles/assimp.dir
+C:/Users/harry/Desktop/assimp/assimp/binaries/code/CMakeFiles/INSTALL.dir
+C:/Users/harry/Desktop/assimp/assimp/binaries/test/CMakeFiles/unit.dir
+C:/Users/harry/Desktop/assimp/assimp/binaries/test/CMakeFiles/INSTALL.dir
+C:/Users/harry/Desktop/assimp/assimp/binaries/test/headercheck/CMakeFiles/INSTALL.dir
