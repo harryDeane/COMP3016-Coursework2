@@ -79,7 +79,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(ProjectDir)irrKlang-master\include;$(ProjectDir)assimp\binaries\include;$(ProjectDir)assimp\include;$(ProjectDir)glm;$(ProjectDir)glew-2.1.0\include;$(ProjectDir)glfw-3.4.bin.WIN64\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)irrKlang-master\lib\Winx64-visualStudio;$(ProjectDir)assimp\binaries\lib\Release;$(ProjectDir)glew-2.1.0\lib\Release\x64;$(ProjectDir)glfw-3.4.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)irrKlang-master\lib\Winx64-visualStudio;$(ProjectDir)assimp\binaries\lib\;$(ProjectDir)glew-2.1.0\lib\Release\x64;$(ProjectDir)glfw-3.4.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
