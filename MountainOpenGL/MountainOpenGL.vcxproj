@@ -78,8 +78,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)glm;$(ProjectDir)glew-2.1.0\include;$(ProjectDir)glfw-3.4.bin.WIN64\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)glew-2.1.0\lib\Release\x64;$(ProjectDir)glfw-3.4.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)irrKlang-master\include;$(ProjectDir)assimp\binaries\include;$(ProjectDir)assimp\include;$(ProjectDir)glm;$(ProjectDir)glew-2.1.0\include;$(ProjectDir)glfw-3.4.bin.WIN64\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)irrKlang-master\lib\Winx64-visualStudio;$(ProjectDir)assimp\binaries\lib\Release\;$(ProjectDir)glew-2.1.0\lib\Release\x64;$(ProjectDir)glfw-3.4.bin.WIN64\lib-vc2019;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -118,12 +118,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)glm;$(ProjectDir)glew-2.1.0\include;$(ProjectDir)glfw-3.4.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)irrKlang-master\include;$(ProjectDir)glm;$(ProjectDir)glew-2.1.0\include;$(ProjectDir)glfw-3.4.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;glew32s.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>irrklang.lib;assimp-vc142-mt.lib;opengl32.lib;glew32.lib;glew32s.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

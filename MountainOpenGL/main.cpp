@@ -1,6 +1,7 @@
 // main.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 #define STB_PERLIN_IMPLEMENTATION
+#define STB_IMAGE_IMPLEMENTATION
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -11,10 +12,136 @@
 #include <vector>
 #include <cmath>
 #include "stb_perlin.h"
-#include "C:/Users/harry/Desktop/COMP3016/Part2/test/MountainOpenGL/glm/glm.hpp"
-#include <C:/Users/harry/Desktop/COMP3016/Part2/test/MountainOpenGL/glm/gtc/matrix_transform.hpp>
-#include <C:/Users/harry/Desktop/COMP3016/Part2/test/MountainOpenGL/glm/gtc/type_ptr.hpp>
+#include "glm.hpp"
+#include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
 #include "Camera.h"
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+#include "stb_image.h"
+
+#include <stdio.h>
+#include <irrKlang.h>
+
+using namespace irrklang;
+
+#pragma comment(lib, "irrKlang.lib")
+
+struct Vertex {
+    glm::vec3 position;
+    glm::vec3 normal;
+    glm::vec2 texCoords;
+};
+
+GLuint VAO, VBO, EBO, textureID;
+
+GLuint loadTexture(const char* path) {
+    int width, height, nrChannels;
+    stbi_set_flip_vertically_on_load(true); // Flip texture if needed
+    unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 0);
+
+    if (!data) {
+        std::cerr << "Failed to load texture: " << path << std::endl;
+        std::cerr << "STB Error: " << stbi_failure_reason() << std::endl;
+        return 0;
+    }
+
+    std::cerr << "texture loaded: " << path << std::endl;
+
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    GLenum format = (nrChannels == 3) ? GL_RGB : GL_RGBA;
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  
+
+    stbi_image_free(data);
+   
+    return texture;
+}
+
+
+// Load Model
+void loadModel(const std::string& path) {
+    Assimp::Importer importer;
+    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+        std::cerr << "Assimp Error: " << importer.GetErrorString() << std::endl;
+        return;
+    }
+
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
+
+    aiMesh* mesh = scene->mMeshes[0];
+    for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+        Vertex vertex;
+        vertex.position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
+        vertex.normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
+        vertex.texCoords = { mesh->mTextureCoords[0] ? mesh->mTextureCoords[0][i].x : 0.0f,
+                             mesh->mTextureCoords[0] ? mesh->mTextureCoords[0][i].y : 0.0f };
+        vertices.push_back(vertex);
+    }
+
+    for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
+        aiFace face = mesh->mFaces[i];
+        for (unsigned int j = 0; j < face.mNumIndices; j++) {
+            indices.push_back(face.mIndices[j]);
+        }
+    }
+
+    // Set up buffers
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), &vertices[0], GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+    glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+    glEnableVertexAttribArray(2);
+
+    glBindVertexArray(0);
+}
+
+// Render Model
+void renderModel(GLuint shaderProgram) {
+    glUseProgram(shaderProgram);
+
+    // Set texture uniform
+    glUniform1i(glGetUniformLocation(shaderProgram, "useTexture"), 1); // Model uses texture
+    glUniform1i(glGetUniformLocation(shaderProgram, "texture1"), 0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+
+    // Render the model
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+}
+
 
 // Terrain generation settings
 const int gridSize = 100;  // The size of the terrain grid
@@ -23,31 +150,9 @@ const float frequency = 0.1f; // Controls the "roughness" of the terrain
 const float amplitude = 10.0f; // Controls the height of the terrain
 
 // Time tracking for day/night cycle
-float dayTime = 0.0f; // 0.0f to 1.0f, where 0.0f is midnight and 1.0f is the next midnight
-const float dayCycleSpeed = 0.1f; // Adjust to control how fast the day passes (e.g., higher value = faster cycle)
+float dayTime = 0.0f;
+const float dayCycleSpeed = 0.1f; // Adjust to control how fast the day passes
 
-
-// Cube vertices (positions) for testing
-GLfloat vertices[] = {
-    -0.5f, -0.5f, -0.5f, // bottom-left-back
-     0.5f, -0.5f, -0.5f, // bottom-right-back
-     0.5f,  0.5f, -0.5f, // top-right-back
-    -0.5f,  0.5f, -0.5f, // top-left-back
-    -0.5f, -0.5f,  0.5f, // bottom-left-front
-     0.5f, -0.5f,  0.5f, // bottom-right-front
-     0.5f,  0.5f,  0.5f, // top-right-front
-    -0.5f,  0.5f,  0.5f  // top-left-front
-};
-
-// Cube indices (6 faces, each with 2 triangles)
-GLuint indices[] = {
-    0, 1, 2, 2, 3, 0, // front
-    4, 5, 6, 6, 7, 4, // back
-    0, 1, 5, 5, 4, 0, // left
-    2, 3, 7, 7, 6, 2, // right
-    3, 0, 4, 4, 7, 3, // top
-    1, 2, 6, 6, 5, 1  // bottom
-};
 
 // Global camera object
 Camera camera(glm::vec3(0.0f, 1.0f, 5.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, 0.0f);
@@ -123,6 +228,44 @@ void generateTerrain(std::vector<float>& vertices, std::vector<unsigned int>& in
     }
 }
 
+void renderTerrain(GLuint shaderProgram) {
+
+    glUseProgram(shaderProgram);
+
+    glUniform1i(glGetUniformLocation(shaderProgram, "useTexture"), 0);
+
+    // Generate terrain data
+    std::vector<float> terrainVertices;
+    std::vector<unsigned int> terrainIndices;
+    generateTerrain(terrainVertices, terrainIndices, gridSize, scale);
+
+    // Create VAO, VBO, and EBO for terrain
+    GLuint terrainVAO, terrainVBO, terrainEBO;
+    glGenVertexArrays(1, &terrainVAO);
+    glGenBuffers(1, &terrainVBO);
+    glGenBuffers(1, &terrainEBO);
+
+    glBindVertexArray(terrainVAO);
+
+    // Vertex buffer for terrain
+    glBindBuffer(GL_ARRAY_BUFFER, terrainVBO);
+    glBufferData(GL_ARRAY_BUFFER, terrainVertices.size() * sizeof(float), terrainVertices.data(), GL_STATIC_DRAW);
+
+    // Element buffer for terrain
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, terrainEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, terrainIndices.size() * sizeof(unsigned int), terrainIndices.data(), GL_STATIC_DRAW);
+
+    // Vertex attributes
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+
+    glBindVertexArray(terrainVAO);
+    glDrawElements(GL_TRIANGLES, terrainIndices.size(), GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+}
+
 // Function to read shader source from file
 std::string loadShaderSource(const std::string& filePath) {
     std::ifstream shaderFile(filePath);
@@ -190,6 +333,13 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    // Create the sound engine
+    irrklang::ISoundEngine* engine = irrklang::createIrrKlangDevice();
+    if (!engine) {
+        std::cerr << "Could not create sound engine!" << std::endl;
+        return -1;
+    }
+
     // Create a window
     GLFWwindow* window = glfwCreateWindow(800, 600, "Mountain Landscape Explorer", nullptr, nullptr);
     if (!window) {
@@ -197,6 +347,10 @@ int main() {
         glfwTerminate();
         return -1;
     }
+
+    // Load background music and play it in a loop
+    irrklang::ISound* backgroundMusic = engine->play2D("sounds/background.wav", true, false, true);
+
 
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
@@ -216,34 +370,7 @@ int main() {
     // Enable mouse capture mode for first-person view
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    // Generate terrain data
-    std::vector<float> terrainVertices;
-    std::vector<unsigned int> terrainIndices;
-    generateTerrain(terrainVertices, terrainIndices, gridSize, scale);
-
-    // Create VAO, VBO, and EBO for terrain
-    GLuint terrainVAO, terrainVBO, terrainEBO;
-    glGenVertexArrays(1, &terrainVAO);
-    glGenBuffers(1, &terrainVBO);
-    glGenBuffers(1, &terrainEBO);
-
-    glBindVertexArray(terrainVAO);
-
-    // Vertex buffer for terrain
-    glBindBuffer(GL_ARRAY_BUFFER, terrainVBO);
-    glBufferData(GL_ARRAY_BUFFER, terrainVertices.size() * sizeof(float), terrainVertices.data(), GL_STATIC_DRAW);
-
-    // Element buffer for terrain
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, terrainEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, terrainIndices.size() * sizeof(unsigned int), terrainIndices.data(), GL_STATIC_DRAW);
-
-    // Vertex attributes
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    glBindVertexArray(0);
-
-    // Create shader program for terrain
+    // Create shader program
     GLuint shaderProgram = createShaderProgram("vertex_shader.glsl", "fragment_shader.glsl");
     glUseProgram(shaderProgram);
 
@@ -262,8 +389,14 @@ int main() {
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
     glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
+
+    // Load model and texture
+    loadModel("models/block.obj");
+    textureID = loadTexture("models/target.jpg");
+
     // Main render loop
     while (!glfwWindowShouldClose(window)) {
+
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
@@ -286,16 +419,24 @@ int main() {
         view = camera.GetViewMatrix();
         glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
-        // Render terrain
-        glBindVertexArray(terrainVAO);
-        glDrawElements(GL_TRIANGLES, terrainIndices.size(), GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+        renderTerrain(shaderProgram);
+
+        // Render the model
+        renderModel(shaderProgram);
+
+        // Keep the music looping
+        if (backgroundMusic && backgroundMusic->isFinished()) {
+            backgroundMusic->setIsLooped(true);  // Loop the music if it's finished
+        }
 
         // Swap buffers and poll events
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        glGetError();
     }
 
+    engine->drop();  // Release the sound engine
     glfwTerminate();
     return 0;
 }
