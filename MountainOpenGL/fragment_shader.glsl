@@ -15,17 +15,17 @@ uniform sampler2D texture1; // Texture sampler for textured models
 uniform bool useTexture;    // Boolean to indicate whether to use texture
 
 // Function to calculate diffuse lighting
-vec3 calculateDiffuse(vec3 lightDir) {
-    float diff = max(dot(normalize(lightDir), vec3(0, 1, 0)), 0.0); // Assuming y-up normals for now
+vec3 calculateDiffuse(vec3 normal, vec3 lightDir) {
+    float diff = max(dot(normal, lightDir), 0.0);
     return diff * lightColor;
 }
 
 void main() {
     // Terrain height-based color mapping
     float height = FragPos.y;
-    vec4 lowColor = vec4(0.0, 0.5, 0.0, 1.0);       
-    vec4 midColor = vec4(0.55, 0.27, 0.07, 1.0);    
-    vec4 highColor = vec4(1.0, 1.0, 1.0, 1.0);      
+    vec4 lowColor = vec4(0.0, 0.5, 0.0, 1.0);       // Green for low-altitude areas
+    vec4 midColor = vec4(0.55, 0.27, 0.07, 1.0);    // Brown for mid-altitude areas
+    vec4 highColor = vec4(1.0, 1.0, 1.0, 1.0);      // White for high-altitude areas
 
     vec4 terrainColor;
     if (height < 1.0) {
