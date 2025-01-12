@@ -326,6 +326,53 @@ glm::vec3 lightPos(50.0f, 50.0f, 50.0f);  // Directional light position
 glm::vec3 lightColor(1.0f, 1.0f, 1.0f);   // White light (Sunlight)
 glm::vec3 ambientColor(0.1f, 0.1f, 0.1f);  // Low ambient light to simulate dawn/dusk
 
+// Function to load a model using Assimp
+GLuint loadModel(const std::string& path, std::vector<GLfloat>& vertices, std::vector<GLuint>& indices) {
+    Assimp::Importer importer;
+    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+        std::cerr << "Error loading model: " << importer.GetErrorString() << std::endl;
+        return 0;
+    }
+
+    aiMesh* mesh = scene->mMeshes[0];  // Assuming the first mesh in the scene for simplicity
+
+    for (unsigned int i = 0; i < mesh->mNumVertices; i++) {
+        aiVector3D vertex = mesh->mVertices[i];
+        vertices.push_back(vertex.x);
+        vertices.push_back(vertex.y);
+        vertices.push_back(vertex.z);
+    }
+
+    for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
+        aiFace face = mesh->mFaces[i];
+        for (unsigned int j = 0; j < face.mNumIndices; j++) {
+            indices.push_back(face.mIndices[j]);
+        }
+    }
+
+    GLuint VAO, VBO, EBO;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), &vertices[0], GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+
+    return VAO;
+}
+
 int main() {
     // Initialize GLFW
     glfwInit();
@@ -428,6 +475,15 @@ int main() {
         if (backgroundMusic && backgroundMusic->isFinished()) {
             backgroundMusic->setIsLooped(true);  // Loop the music if it's finished
         }
+
+        // Apply rotation for spinning
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // Spin on Y-axis
+
+        // Render the animated model
+        glBindVertexArray(modelVAO);
+        glUseProgram(shaderProgram); 
+        glDrawElements(GL_TRIANGLES, modelIndices.size(), GL_UNSIGNED_INT, 0);
 
         // Swap buffers and poll events
         glfwSwapBuffers(window);
