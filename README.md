@@ -60,8 +60,7 @@ Custom shaders are used to enhance the visual quality of the game.
 1. **Clone the Repository**:
 
     ```bash
-    git clone https://github.com/yourusername/MountainLandscapeExplorer.git
-    cd MountainLandscapeExplorer
+    git clone https://github.com/harryDeane/COMP3016-Coursework.git
     ```
 
 2. **Dependencies**:
