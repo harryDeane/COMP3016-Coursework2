@@ -63,10 +63,10 @@ GLuint loadTexture(const char* path) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  
+
 
     stbi_image_free(data);
-   
+
     return texture;
 }
 
@@ -475,15 +475,6 @@ int main() {
         if (backgroundMusic && backgroundMusic->isFinished()) {
             backgroundMusic->setIsLooped(true);  // Loop the music if it's finished
         }
-
-        // Apply rotation for spinning
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f)); // Spin on Y-axis
-
-        // Render the animated model
-        glBindVertexArray(modelVAO);
-        glUseProgram(shaderProgram); 
-        glDrawElements(GL_TRIANGLES, modelIndices.size(), GL_UNSIGNED_INT, 0);
 
         // Swap buffers and poll events
         glfwSwapBuffers(window);
