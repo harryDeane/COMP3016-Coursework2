@@ -53,6 +53,14 @@ Custom shaders are used to enhance the visual quality of the game.
 - **Vertex Shader**: Transforms vertices from 3D space to screen space.
 - **Fragment Shader**: Handles the coloring and texturing of the terrain and models.
 
+### 9. **Error Handling**
+   ![Screenshot 2025-01-13 232932](https://github.com/user-attachments/assets/73e617d1-2487-4066-b33a-5991f3839fa1)
+   This checks to ensure models are loaded.
+
+   ![Screenshot 2025-01-13 233659](https://github.com/user-attachments/assets/3784b4bd-b767-4a73-a1d3-3a461c486f61)
+   This ensures shader files are able to be opened and read.
+
+
 ---
 
 ## Installation
