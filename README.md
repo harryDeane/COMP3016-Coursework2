@@ -3,6 +3,9 @@
 ## Overview
 This project is an interactive 3D mountain landscape explorer built using OpenGL and various other libraries like GLFW, GLEW, ASSIMP, and Irrklang. It features terrain generation, model and texture loading, audio playback, camera movement, and more. The goal of the project is to provide an immersive environment where the player navigates a procedurally generated mountain landscape.
 
+## Youtube
+https://youtu.be/q4-YN3lhoqs
+
 ## Features
 
 ### 1. **Terrain Generation**
